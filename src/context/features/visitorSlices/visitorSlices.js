@@ -1,38 +1,79 @@
 
 
 import { createSlice } from '@reduxjs/toolkit'
+import axios from 'axios';
 
-const navbarSlice = createSlice({
+
+export const STATUES = Object.freeze({
+
+    SUCCESS:"success",
+    LODGING:"loading",
+    ERROR:"error",
+})
+
+
+const visitorSlice = createSlice({
  name: 'navShift',
  initialState: {
-     home:0,
-   about :0,
-   skill:0,
-   project:0,
-   contact:0
-
+    success:false,
+    status: STATUES,
+    isAuth:false
  },
  reducers: {
 
-   setValHome: (state, action) => {
-     state.home = action.payload
-   },
-   setValAbout: (state, action) => {
-     state.about = action.payload
-   },
-   setValSkill: (state, action) => {
-     state.skill = action.payload
-   },
-   setValProject: (state, action) => {
-     state.project = action.payload
-   },
-   setValContact: (state, action) => {
-     state.contact = action.payload
-   }
+     setStatus: (state, action)=>{
+
+        state.status = action.payload;
+
+    },
+
+    getSuccess:(state , action )=>{
+        state.success = action.payload;
+    },
+
+    getIsAuth: (state, action)=>{
+
+        state.isAuth = action.payload;
+    },
+
+ 
  }
 })
 
 // Action creators are generated for each case reducer function
-export const { setValHome, setValAbout, setValSkill,setValProject,setValContact } = navbarSlice.actions
+export const { setStatus, getSuccess ,getIsAuth } = visitorSlice.actions
 
-export default navbarSlice.reducer
+export default visitorSlice.reducer 
+
+
+
+export function submitDetail(formDetail){
+
+
+    return async function submitDetailThunk(dispatch,getState){
+
+                const initState = getState();
+                console.log(initState);
+
+                try {
+                    dispatch(setStatus(STATUES.LODGING));
+
+                    const data = await axios('https://floating-depths-11719.herokuapp.com/portfolio/api/post/data',{
+                    method:"post",
+                    data:formDetail
+
+                    })
+                    console.log(data.data);
+                    console.log(data.status);
+                    dispatch(getSuccess(data.data.success));
+                    
+                    dispatch(setStatus(STATUES.SUCCESS));
+                    
+                } catch (error) {
+                    
+                    dispatch(setStatus(STATUES.ERROR));
+                    console.log(error.message);
+                }
+
+    }
+}

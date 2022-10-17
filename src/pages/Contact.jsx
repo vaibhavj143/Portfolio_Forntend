@@ -10,14 +10,24 @@ import {
   BsMailbox,
   BsPerson,
 } from "react-icons/bs";
+import {
+  TiTick
+} from "react-icons/ti";
+
+// import chakar ui
+
 
 import { BiMessageRounded } from "react-icons/bi";
 
 // import { motion } from "framer-motion";
 
+import { useDispatch, useSelector } from "react-redux";
+import {
+  submitDetail,
+  STATUES,
+} from "../context/features/visitorSlices/visitorSlices.js";
 import { setValContact } from "../context/features/navSlices/navSlices.js";
 
-import { useDispatch } from "react-redux";
 // import { useSelector, useDispatch } from "react-redux";
 
 import "../styles/contact.css";
@@ -26,6 +36,9 @@ const Contact = () => {
   // const pageState = useSelector((state) => state.navReducer);
   const dispatch = useDispatch();
   const refNav = useRef();
+
+  const { status, success, isAuth } = useSelector((state) => state.visitor);
+
   // console.log(pageState);
 
   const [formState, setFormState] = useState({
@@ -34,6 +47,8 @@ const Contact = () => {
     number: "",
     message: "",
   });
+
+  const [Alert , setAlert ] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,16 +60,53 @@ const Contact = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("hi");
+    // console.log(formState)
+
+    dispatch(submitDetail(formState));
+
+    setFormState({
+      name: "",
+      email: "",
+      number: "",
+      message: "",
+    })
+
+    console.log(status);
+
+    setAlert(true);
+
+const timeoutId =  setTimeout(()=>{
+        setAlert(false);
+      },3000)
+
+    clearTimeout(timeoutId);
+
+    // console.log("hi");
   };
 
   useEffect(() => {
     dispatch(setValContact(refNav.current.offsetTop - 100));
-  }, [dispatch]);
+  }, [dispatch , Alert]);
 
   return (
     <>
       <Heading heading={`Contact`} subHeading={`get in touch`} />
+
+      {status === STATUES.SUCCESS && success && Alert ? (
+       <>
+          <div  className="alertContactSuccess" >
+            <TiTick/> Got your Response
+          </div>
+          <div  className="alertContactInfo" >
+            <TiTick/>Check your Email
+          </div>
+       </>
+       
+      ) : null}
+
+      {
+        <div></div>
+      }
 
       <div ref={refNav} className="contactContainer">
         <address className="contactLeft">
